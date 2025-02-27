@@ -15,9 +15,9 @@ The HouseWhisper Scheduler Server is a Spring Boot application that provides var
 **Request Body:**
 ```json
 {
-  "agents": ["agent1", "agent2"],
-  "startTime": "2023-11-01T09:00:00",
-  "endTime": "2023-11-01T10:00:00"
+  "agents": ["agent1", "agent2", "agent3"],
+  "startTime": "2025-02-27T17:00:00",
+  "endTime": "2025-02-27T19:30:00"
 }
 ```
 
@@ -33,10 +33,10 @@ The HouseWhisper Scheduler Server is a Spring Boot application that provides var
 **Request Body:**
 ```json
 {
-  "agents": ["agent1", "agent2"],
+  "agents": ["agent1", "agent2", "agent3"],
   "durationInMinutes": 60,
-  "startTimeFrame": "2023-11-01T09:00:00",
-  "endTimeFrame": "2023-11-01T17:00:00"
+  "startTimeFrame": "2025-02-27T16:00:00",
+  "endTimeFrame": "2025-02-27T20:00:00"
 }
 ```
 
@@ -54,12 +54,12 @@ The HouseWhisper Scheduler Server is a Spring Boot application that provides var
 ```json
 [
   {
-    "start_time": "2023-11-01T09:00:00",
-    "end_time": "2023-11-01T10:00:00"
+    "start_time": "2025-03-01T09:00:00",
+    "end_time": "2025-03-01T10:00:00"
   },
   {
-    "start_time": "2023-11-01T11:00:00",
-    "end_time": "2023-11-01T12:00:00"
+    "start_time": "2025-03-02T11:00:00",
+    "end_time": "2025-03-04T15:00:00"
   }
 ]
 ```
@@ -77,14 +77,14 @@ The HouseWhisper Scheduler Server is a Spring Boot application that provides var
 **Request Body:**
 ```json
 {
-  "clientId": "client1",
+  "clientId": "client3",
   "availableTimeSlots": [
     {
-      "start_time": "2023-11-01T09:00:00",
+      "start_time": "2025-03-01T09:00:00",
       "end_time": "2023-11-01T10:00:00"
     },
     {
-      "start_time": "2023-11-01T11:00:00",
+      "start_time": "2025-03-01T11:00:00",
       "end_time": "2023-11-01T12:00:00"
     }
   ]
