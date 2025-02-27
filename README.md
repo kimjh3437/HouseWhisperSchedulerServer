@@ -154,6 +154,52 @@ public class AIRecommendedTimeSlotDTO {
 }
 ```
 
+## Models
+
+### Agent
+
+The `Agent` class represents an agent in the system. It contains the following fields:
+- `agent_id`: A unique identifier for the agent.
+- `tasks`: A list of task IDs assigned to the agent.
+
+### Client
+
+The `Client` class represents a client in the system. It contains the following fields:
+- `client_id`: A unique identifier for the client.
+- `personal`: An instance of `ClientPersonal` containing personal information about the client.
+- `metadata`: A list of `ClientMetadata` instances containing metadata about the client.
+
+### ClientPersonal
+
+The `ClientPersonal` class contains personal information about a client. It includes the following fields:
+- `client_id`: A unique identifier for the client.
+- `firstname`: The first name of the client.
+- `lastname`: The last name of the client.
+- `email`: The email address of the client.
+
+### ClientMetadata
+
+The `ClientMetadata` class contains metadata about a client. It includes the following fields:
+- `client_id`: A unique identifier for the client.
+- `description`: A description of the client's preferences or habits.
+- `event_time`: The time associated with the metadata event.
+
+### WorkTask
+
+The `WorkTask` class represents a task assigned to agents. It includes the following fields:
+- `task_id`: A unique identifier for the task.
+- `details`: An instance of `WorkTaskDetail` containing detailed information about the task.
+
+### WorkTaskDetail
+
+The `WorkTaskDetail` class contains detailed information about a task. It includes the following fields:
+- `taskType`: The type of the task.
+- `description`: A description of the task.
+- `taskStartTime`: The start time of the task.
+- `taskEndTime`: The end time of the task.
+- `clients`: A list of client IDs associated with the task.
+- `agents`: A list of agent IDs assigned to the task.
+
 ## Services
 
 ### SchedulingService
