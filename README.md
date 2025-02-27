@@ -6,6 +6,8 @@ The HouseWhisper Scheduler Server is a Spring Boot application that provides var
 
 ## API Endpoints
 
+### Service URL : https://housewhisper.azurewebsites.net
+
 ### 1. Check Availability
 
 **Endpoint:** `/schedule/check-availability`  
