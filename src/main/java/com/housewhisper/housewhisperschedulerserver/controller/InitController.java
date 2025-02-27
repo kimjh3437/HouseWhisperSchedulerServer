@@ -21,13 +21,4 @@ public class InitController {
     public void initialize() {
         initService.init();
     }
-
-    /**
-     * Endpoint to generate a random description.
-     * @return String containing the generated description.
-     */
-    @GetMapping("/generateRandomDescription")
-    public String generateRandomDescription() {
-        return initService.generateRandomDescription();
-    }
 }

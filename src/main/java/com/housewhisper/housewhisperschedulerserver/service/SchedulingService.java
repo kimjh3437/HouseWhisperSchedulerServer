@@ -174,14 +174,27 @@ public class SchedulingService {
                 .map(slot -> slot.getStart_time() + " to " + slot.getEnd_time())
                 .collect(Collectors.joining(", "));
 
-        String prompt = "Based on the following client metadata descriptions: " + metadataDescriptions +
+        String prompt = "Based on the following client metadata descriptions for" + client.getPersonal().getFirstname() + ": " + metadataDescriptions +
                 " and the available time slots: " + timeSlotDescriptions +
-                ", recommend the best time slots. Return the indices of the recommended time slots as a comma-separated list with no spaces. Add a reasoning at the end separated by '|'.";
+                ", recommend the best time slots. Return the indices of the recommended time slots as a comma-separated list with no spaces. " +
+                "Add a reasoning at the end separated by '|'. The response must strictly follow the format: '1,2,3|Reasoning text'.";
 
         ChatResponse response = chatModel.call(new Prompt(prompt));
 
-        List<AvailableTimeSlotsDTO> recommendedTimeSlots = parseResponse(response, availableTimeSlots);
-        String reasoning = parseReasoning(response);
+        String result = response.getResult().getOutput().getText();
+        String[] parts = result.split("\\|");
+        String indicesPart = parts[0];
+        String reasoning = parts.length > 1 ? parts[1].trim() : "";
+
+        List<Integer> indices = Arrays.stream(indicesPart.split(","))
+                .filter(this::isInteger)
+                .map(Integer::parseInt)
+                .filter(index -> index >= 0 && index < availableTimeSlots.size()) // Ensure index is within bounds
+                .collect(Collectors.toList());
+
+        List<AvailableTimeSlotsDTO> recommendedTimeSlots = indices.stream()
+                .map(availableTimeSlots::get)
+                .collect(Collectors.toList());
 
         return AIRecommendedTimeSlotDTO.builder()
                 .clientId(clientId)
@@ -201,11 +214,24 @@ public class SchedulingService {
         String[] parts = result.split("\\|");
         String indicesPart = parts[0];
         List<Integer> indices = Arrays.stream(indicesPart.split(","))
+                .filter(this::isInteger)
                 .map(Integer::parseInt)
-                .toList();
+                .collect(Collectors.toList());
         return indices.stream()
                 .map(availableTimeSlots::get)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

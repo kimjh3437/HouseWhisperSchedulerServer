@@ -12,12 +12,14 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 
@@ -59,34 +61,44 @@ public class InitService {
         }
     }
 
-    private void generateRandomClients(int numberOfClients) {
+    @Async
+    public CompletableFuture<Void> generateRandomClients(int numberOfClients) {
         clientService.removeClients();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (int i = 0; i < numberOfClients; i++) {
-            String clientId = "client" + i;
-            ClientPersonal clientPersonal = ClientPersonal.builder()
-                    .client_id(clientId)
-                    .firstname("Client")
-                    .lastname(String.valueOf(i + 1))
-                    .email("client" + (i + 1) + "@example.com")
-                    .build();
-            Random random = new Random();
-            List<ClientMetadata> clientMetadata = new ArrayList<>();
-            for (int j = 0; j < 3; j++) { // Generate 3-4 random metadata entries
-                String description = generateRandomDescription();
-                ClientMetadata metadata = ClientMetadata.builder()
-                        .client_id(clientId)
-                        .description(description)
-                        .event_time(new DateTime(System.currentTimeMillis() + random.nextInt(1000000000)))
-                        .build();
-                clientMetadata.add(metadata);
-            }
-            Client client = Client.builder()
-                    .client_id(clientId)
-                    .personal(clientPersonal)
-                    .metadata(clientMetadata)
-                    .build();
-            clientService.saveClient(client);
+            futures.add(generateRandomClient(i));
         }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> generateRandomClient(int i) {
+        String clientId = "client" + i;
+        ClientPersonal clientPersonal = ClientPersonal.builder()
+                .client_id(clientId)
+                .firstname("Client")
+                .lastname(String.valueOf(i + 1))
+                .email("client" + (i + 1) + "@example.com")
+                .build();
+        Random random = new Random();
+        List<ClientMetadata> clientMetadata = new ArrayList<>();
+        for (int j = 0; j < 3; j++) { // Generate 3-4 random metadata entries
+            String description = generateRandomDescription().join();
+            ClientMetadata metadata = ClientMetadata.builder()
+                    .client_id(clientId)
+                    .description(description)
+                    .event_time(new DateTime(System.currentTimeMillis() + random.nextInt(1000000000)))
+                    .build();
+            clientMetadata.add(metadata);
+        }
+        Client client = Client.builder()
+                .client_id(clientId)
+                .personal(clientPersonal)
+                .metadata(clientMetadata)
+                .build();
+        clientService.saveClient(client);
+        return CompletableFuture.completedFuture(null);
     }
 
     private void generateRandomTasks() {
@@ -135,6 +147,7 @@ public class InitService {
             }
 
             WorkTaskDetail taskDetail = WorkTaskDetail.builder()
+                    .task_id("task" + i)
                     .taskType("type1")
                     .description("Description for task " + i)
                     .taskStartTime(taskStartTime)
@@ -171,12 +184,13 @@ public class InitService {
         return false;
     }
 
-    public String generateRandomDescription() {
+    @Async
+    public CompletableFuture<String> generateRandomDescription() {
         String prompt = "Generate one sentence random description for a client's preferences, habits, and whether they are a morning or evening person.";
         ChatResponse response = chatModel.call(new Prompt(prompt));
         if (response != null && response.getResult() != null && response.getResult().getOutput() != null) {
-            return response.getResult().getOutput().getText();
+            return CompletableFuture.completedFuture(response.getResult().getOutput().getText());
         }
-        return "";
+        return CompletableFuture.completedFuture("");
     }
 }
